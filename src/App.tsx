@@ -1,10 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Plus, Trash2, MoveUp, MoveDown, Download, Eye, Edit3, Upload, FileText, Save } from 'lucide-react';
 
-// ============================================================
-// DESIGN SYSTEM - All CSS variables and styles in one place
-// These match the document style from the PDF generator above
-// ============================================================
 const STYLES = `
   body {
     font-family: Arial, sans-serif;
@@ -194,9 +190,6 @@ const DocumentGenerator = () => {
   const addListItem      = (sid)        => setSections(sections.map(s => s.id === sid ? { ...s, content: [...s.content, 'Nova stavka'] } : s));
   const deleteListItem   = (sid, i)     => setSections(sections.map(s => s.id === sid ? { ...s, content: s.content.filter((_, idx) => idx !== i) } : s));
 
-  // ─────────────────────────────────────────────────
-  // HTML GENERATION
-  // ─────────────────────────────────────────────────
   const buildBodyContent = () => sections.map(s => {
     if (s.type === 'heading')   return `<h${s.level}>${s.content}</h${s.level}>`;
     if (s.type === 'paragraph') return `<p>${s.content}</p>`;
@@ -234,12 +227,6 @@ const DocumentGenerator = () => {
     URL.revokeObjectURL(url);
   };
 
-  // ─────────────────────────────────────────────────
-  // PDF GENERATION
-  // The trick: inject html2pdf from CDN dynamically,
-  // then call it on a hidden div with the document HTML.
-  // page-break-inside: avoid on boxes keeps them intact.
-  // ─────────────────────────────────────────────────
   const downloadPDF = () => {
     const loadLib = (src) => new Promise((resolve) => {
       if (document.querySelector(`script[src="${src}"]`)) return resolve();
@@ -251,7 +238,6 @@ const DocumentGenerator = () => {
 
     loadLib('https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js')
       .then(() => {
-        // Build a full standalone HTML string and use fromHTML
         const html = `
           <style>${STYLES}</style>
           <div class="content" style="box-shadow:none;">
@@ -272,9 +258,6 @@ const DocumentGenerator = () => {
       });
   };
 
-  // ─────────────────────────────────────────────────
-  // PROJECT SAVE / LOAD
-  // ─────────────────────────────────────────────────
   const saveProject = () => {
     const project = { title, sections, nextId, version: '1.0' };
     const blob    = new Blob([JSON.stringify(project, null, 2)], { type: 'application/json' });
@@ -312,11 +295,6 @@ const DocumentGenerator = () => {
     setShowLoadMenu(false);
   };
 
-
-
-  // ─────────────────────────────────────────────────
-  // RENDER HELPERS
-  // ─────────────────────────────────────────────────
   const BOX_COLORS = {
     info:     'bg-blue-50   border-2 border-blue-600',
     tips:     'bg-yellow-50 border-2 border-yellow-500',
@@ -370,7 +348,6 @@ const DocumentGenerator = () => {
       );
     }
 
-    // Preview mode
     if (section.type === 'heading') {
       const Tag = `h${section.level}`;
       const cls = section.level === 2 ? 'text-2xl font-bold text-blue-900 mt-8 mb-4' : 'text-xl font-bold text-blue-900 mt-6 mb-3';
@@ -384,9 +361,6 @@ const DocumentGenerator = () => {
     if (section.type === 'list')      return <ul className="list-disc pl-6 my-4 space-y-2">{section.content.map((item, i) => <li key={i}>{item}</li>)}</ul>;
   };
 
-  // ─────────────────────────────────────────────────
-  // RENDER
-  // ─────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <div className="max-w-4xl mx-auto">
